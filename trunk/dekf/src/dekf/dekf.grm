@@ -1,0 +1,176 @@
+﻿"Name"     = 'Dekf'
+"Author"   = 'Ale Canahui'
+"About"    = 'Versión simplificada de Java'
+
+"Start Symbol" = <Program>
+
+! -------------------------------------------------
+! Character Sets
+! -------------------------------------------------
+
+! -------------------------------------------------
+! Terminals
+! -------------------------------------------------
+
+id = {Letter}{Alphanumeric}*
+num = {Digit}{Digit}*
+character = ''{AlphaNumeric}''
+
+! Comments
+
+Comment Start = '/*'
+Comment End = '*/'
+Comment Line = '//'
+
+! -------------------------------------------------
+! Rules
+! -------------------------------------------------
+
+! The grammar starts below
+<Program>   ::= 'class' 'Program' '{' <KDeclaration> '}'
+
+<KDeclaration>
+            ::= <Declaration> <KDeclaration>
+             |
+
+<Declaration>
+            ::= <StructDeclaration>
+             | <VarDeclaration>
+             | <MethodDeclaration>
+
+<KVarDeclaration>
+            ::= <VarDeclaration> <KVarDeclaration>
+
+<VarDeclaration>
+            ::= <VarMethodType> id ';'
+             | <VarMethodType> id '[' num ']' ';'
+
+<StructDeclaration>
+            ::= 'struct' id '{' <KVarDeclaration> '}'
+
+<VarMethodType>
+            ::= 'int'
+             | 'char'
+             | 'boolean'
+             | 'void'
+             | 'struct' id
+             | <structDeclaration>
+
+<MethodDeclaration>
+            ::= <VarMethodType> id '(' <OParameter> ')' <Block>
+
+<OParameter>
+            ::= <Parameter> <KParameter>
+             |
+
+<KParameter>
+            ::= ',' <Parameter> <KParameter>
+             |
+
+<Parameter>
+            ::= <ParameterType> id
+             | <ParameterType> id '[' ']'
+
+<ParameterType>
+            ::= 'int'
+             | 'char'
+             | 'boolean'
+
+<Block>     ::= '{' <KVarDeclaration> <KStatement> '}'
+
+<KStatement>
+            ::= <Statement> <KStatement>
+             |
+
+<Statement> ::=  <Block>
+             | 'if' '(' <Expression> ')' <Block> <HElse>
+             | 'while' '(' <Expression> ')' <Block>
+             | 'return' <OBlock> ';'
+             | <Location> '=' <Expression>
+             | <OExpression> ';'
+
+<HElse>     ::= 'else' <Block>
+             |
+
+<OBlock>    ::= <Block>
+             |
+
+<OExpression>
+            ::= <Expression>
+             |
+
+<Expression>
+            ::= <RelExp> <CondOp> <Expression>
+             | <RelExp>
+
+<RelExp>    ::= <SumExp> <RelOp> <RelExp>
+             | <SumExp> 
+
+<SumExp>    ::= <MultExp> <SumOp> <SumExp>
+             | <MultExp> 
+
+<MultExp>   ::= <NegExp> <MultOp> <MultExp>
+             | <NegExp>
+
+<NegExp>    ::= '-' <Val>
+             | '!' <Val>
+             | <Val>
+
+<CondOp>    ::= '&&'
+             | '||'
+
+<RelOp>     ::= '<='
+             | '<'
+             | '>'
+             | '>='
+             | <EqOp>
+
+<EqOp>      ::= '=='
+             | '!='
+
+<SumOp>     ::= '+'
+             | '-'
+
+<MultOp>    ::= '*'
+             | '/'
+             | '%'
+
+<Val>       ::= <Location>
+             | <MethodCall>
+             | <Literal>
+             | '(' <Expression> ')'
+
+<Location>  ::= <LocationBeginning>
+             | <LocationBeginning>'.'<Location>
+
+<LocationBeginning>
+            ::= id  <AltLocationBeginning>
+            
+<AltLocationBeginning>
+            ::= '[' <expression> ']'
+             |
+
+<MethodCall>
+            ::= id '(' <OArg> ')'
+
+<OArg>      ::= <Arg> <KArg>
+             |
+
+<KArg>      ::= ',' <Arg> <KArg>
+             |
+
+<Arg>       ::= <Expression>
+
+<Literal>   ::= <IntLiteral>
+             | <CharLiteral>
+             | <BoolLiteral>
+
+<IntLiteral>
+            ::= num
+
+<CharLiteral>
+            ::= character
+
+<BoolLiteral>
+            ::= 'true'
+             | 'false'
