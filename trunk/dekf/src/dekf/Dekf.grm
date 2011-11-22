@@ -1,0 +1,157 @@
+﻿"Name"     = 'Dekf'
+"Author"   = 'Ale Canahui'
+"Version"  = 'Proyecto 1'
+"Start Symbol" = <Program>
+
+!------------------------------------------------------------------!
+! Reglas Semánticas
+!------------------------------------------------------------------!
+
+id = {Letter}{Alphanumeric}*
+
+num   = {Digit}{Digit}*
+
+character  = ''{AlphaNumeric}''
+
+! Comentarios
+
+Comment Start = '/*'
+Comment End   = '*/'
+
+Comment Line  = '//'
+
+!------------------------------------------------------------------
+! Reglas Sintácticas
+!------------------------------------------------------------------
+
+<Program>               ::= 'class' 'Program' '{' <KDeclaration> '}'
+
+<KDeclaration>          ::= <Declaration> <KDeclaration>
+						 |
+
+<Declaration>           ::= <StructDeclaration>
+						 | <VarDeclaration>
+						 | <MethodDeclaration>
+
+<VarDeclaration>        ::= <VarMethodType> id <VarDeclarationOpc>';'
+
+<VarDeclarationOpc>     ::= '[' num ']' |
+
+<StructDeclaration>     ::= <StructDecHeader> '{' <VarDeclarationK> '}'
+
+<StructDecHeader>       ::= 'struct' id
+
+<VarDeclarationK>       ::= <VarDeclaration> <VarDeclarationK>
+						 |
+
+<VarMethodType>         ::= 'int'
+						 | 'char'
+						 | 'boolean'
+						 | 'void'
+						 | 'struct' id
+						 | <StructDeclaration>
+
+<MethodDeclaration>     ::= <MethodDecHeader> <block>
+
+<methodDecHeader>       ::= <VarMethodType> id '(' <ParameterK> ')'
+
+<ParameterK>            ::= <ParameterC>
+						 |
+						 
+<ParameterC>            ::= <Parameter>
+						 | <ParameterC> ',' <Parameter>
+
+<Parameter>             ::= <ParameterType> id
+						 | <ParameterType> id '[' ']'
+
+<ParameterType>         ::= 'int'
+						 | 'char'
+						 | 'boolean'
+
+<block>                 ::= '{' <VarDeclarationK> <StatementK> '}'
+
+<statementK>            ::= <Statement> <StatementK>
+						 |
+
+<statement>             ::= <Block>
+                         | 'if' '(' <Expression> ')' <Block> <BlockElse>
+                         | 'while' '(' <Expression> ')' <Block>
+                         | 'return' <ExpressionOpc> ';'
+                         | <Location> '=' <Expression> 
+                         | <ExpressionOpc> ';'
+
+<blockElse>             ::= 'else' <block>
+						 |
+						 
+<ExpressionOpc>         ::= <Expression>
+						 |
+
+
+
+!Muchos cambios se basan en: http://www.devincook.com/goldparser/doc/grammars/index.htm y
+! http://www.devincook.com/goldparser/doc/engine-pseudo/trim-reductions.htm
+! La relación de precedencia es de abajo para arriba, entre más abajo, mas "importancia"
+! tiene.
+
+! Para entender también se puede ver de izquierda a derecha. El de lado hasta la izquierda tiene mas
+! procedencia si hablamos solo de una regla.
+
+<Expression>            ::= <RelExp> <CondOp> <Expression>
+						 | <RelExp>
+
+<RelExp>                ::= <SumExp> <RelOp> <RelExp>
+						 | <SumExp> <EqOp> <RelExp>
+						 | <SumExp> 
+
+<SumExp>                ::= <MultiExp> <SumOp> <SumExp>
+						 | <MultExp> 
+
+<MultExp>               ::= <NegExp> <MultOp> <MultExp>
+						 | <NegExp>
+
+<NegExp>	            ::= '-' <val>
+						 | '!' <val>
+						 | <val>
+
+<CondOp>                ::= '&&' | '||'
+
+<RelOp>                 ::= '<=' | '<' | '>' | '>='
+
+<EqOp>                  ::= '==' | '!='
+
+<SumOp>                 ::= '+' | '-'
+
+<MultOp>                ::= '*' | '/' | '%'
+
+<val>                   ::= <Location>
+						 | <MethodCall>
+						 | <Literal>
+						 | '(' <Expression> ')'
+
+<Location>              ::= <LocationMain>
+						 | <LocationMain>'.'<Location>
+						 
+<LocationMain>          ::= id  <LocationOpc>
+
+<LocationOpc>           ::= '[' <Expression> ']'
+						 |
+
+<MethodCall>            ::= id '(' <ArgK> ')'
+
+<ArgK>                  ::= <ArgC>
+						 |
+<ArgC>                  ::= <Arg>
+						 | <ArgC> ',' <Arg>
+
+<Arg>                   ::= <Expression>
+
+<literal>               ::= <int_literal>
+						 | <char_literal>
+						 | <bool_literal>
+
+<int_literal>           ::= num
+
+<char_literal>          ::= character
+
+<bool_literal>          ::= 'true'
+						 | 'false'

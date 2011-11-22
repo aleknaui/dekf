@@ -1,0 +1,24 @@
+COMPILER dekf
+
+	CHARACTERS
+		letter		=	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrtsuvwxyz".
+		digit		=	"0123456789".
+
+		whitespace 	=	'\r'+'\n'+'\t'+' '.
+
+    TOKENS
+    
+		id			=	letter {letter | digit}.
+		num			=	digit {digit}.
+
+    COMMENTS FROM "/*" TO "*/" NESTED
+    COMMENTS FROM "//" TO "\n"
+    COMMENTS FROM "//" TO "\r"
+    
+    IGNORE	whitespace
+    
+    PRODUCTIONS
+    
+    Program		=	{id}.
+
+END dekf.
