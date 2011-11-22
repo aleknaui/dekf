@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.*;
+
 import javax.swing.*;
 
 import java.io.*;
@@ -25,7 +26,7 @@ import java.io.*;
  */
 
 
-public class RedirectedFrame extends JPanel {
+public class RedirectedFrame extends JTextArea {
 
     // Class information
     public static final String PROGRAM_NAME = "Redirect Frame";

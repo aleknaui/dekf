@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -22,9 +25,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+//import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Element;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -32,6 +40,7 @@ import goldengine.java.*;
 
 import com.Ostermiller.Syntax.HighlightedDocument;
 
+import dekf.DekfParser;
 import dekf.DekfParser;
 
 public class Main extends JFrame implements ActionListener{
@@ -60,7 +69,6 @@ public class Main extends JFrame implements ActionListener{
 	
 	/** Consola del editor */
 	private RedirectedFrame consola;
-	
 	
 	// --------------------------------------------------------------------------------
 	// Constructor
@@ -165,7 +173,6 @@ public class Main extends JFrame implements ActionListener{
      * @param args ignored
      */
     public static void main(String[] args) {
-        // create the demo
         Main frame = new Main();
     }
 
@@ -192,13 +199,14 @@ public class Main extends JFrame implements ActionListener{
 	 */
 	private void generarArbolSintactico(){
 		if( promptGuardar() ){
+			consola.setText("");
 			Reduction result = DekfParser.parse(nombreArchivo);
 			if( result != null ){
-				consola.setText("");
+				//consola.setText("");
 				DefaultMutableTreeNode raiz = new DefaultMutableTreeNode( "program" );
 				DefaultTreeModel arbol = new DefaultTreeModel( raiz );
 				crearArbol(arbol, raiz, result);
-				new TreeDisplay((DefaultMutableTreeNode )arbol.getRoot());
+				new TreeDisplay((DefaultMutableTreeNode )arbol.getRoot());				
 			}
 		}
 	}
@@ -207,12 +215,13 @@ public class Main extends JFrame implements ActionListener{
 	 * Convierte una reducción y la convierte en un árbol
 	 * desplegable con JTree
 	 */
-	public static void crearArbol(DefaultTreeModel tree, DefaultMutableTreeNode root, Reduction reduccion){
+	private void crearArbol(DefaultTreeModel tree, DefaultMutableTreeNode root, Reduction reduccion){
         
         for(int i=0; i<reduccion.getTokenCount(); i++)
         {
+        	// System.out.println(reduccion.getToken(i).getName() + " : " + reduccion.getToken(i).getKind());
             if(reduccion.getToken(i).getKind()==0){
-                 Reduction red = (Reduction)reduccion.getToken(i).getData();
+                Reduction red = (Reduction)reduccion.getToken(i).getData();
                 String rule = red.getParentRule().definition();
                 String rule_name = reduccion.getToken(i).getName();
                 //System.out.println(" + "+rule_name+ " + ."+rule+".");
@@ -236,9 +245,7 @@ public class Main extends JFrame implements ActionListener{
                 DefaultMutableTreeNode leaf = new DefaultMutableTreeNode(txt_in_leaf);
                  tree.insertNodeInto(leaf, root, i);
             }
-        }
-        
-        
+        }        
     }
 	
 	/**
@@ -256,7 +263,7 @@ public class Main extends JFrame implements ActionListener{
 	 */
 	private void abrir(){
 		if(promptGuardar()){
-			JFileChooser chooser = new JFileChooser();
+			JFileChooser chooser = new JFileChooser("test/");
 			chooser.setDialogTitle("Abrir");
 			chooser.setMultiSelectionEnabled(false);
 			chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
@@ -286,7 +293,7 @@ public class Main extends JFrame implements ActionListener{
 	 * Guarda el trabajo en un nuevo archivo.
 	 */
 	private void guardarComo(){
-		JFileChooser chooser = new JFileChooser();
+		JFileChooser chooser = new JFileChooser("test/");
 		chooser.setDialogTitle("Guardar Como");
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );

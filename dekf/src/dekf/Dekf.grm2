@@ -1,0 +1,114 @@
+﻿"Name"     = 'Dekf'
+"Author"   = 'Ale Canahui'
+"Version"  = 'Proyecto 1'
+"Start Symbol" = <Program>
+
+!------------------------------------------------------------------!
+! Reglas Semánticas
+!------------------------------------------------------------------!
+
+id = {Letter}{Alphanumeric}*
+
+num   = {Digit}{Digit}*
+
+character  = ''{AlphaNumeric}''
+
+! Comentarios
+
+Comment Start = '/*'
+Comment End   = '*/'
+
+Comment Line  = '//'
+
+!------------------------------------------------------------------
+! Reglas Sintácticas
+!------------------------------------------------------------------
+
+<Program>               ::= 'class' 'Program' '{' <declarationK> '}'
+
+<declarationK>          ::= <declaration> <declarationK> |
+<declaration>           ::= <structDeclaration> | <varDeclaration> | <methodDeclaration>
+
+<varDeclaration>        ::= <methodType> id <varDeclaration1>';'
+<varDeclaration1>       ::= '[' num ']' |
+
+<structDeclaration>     ::= <structDecHeader> '{' <varDeclarationK> '}'
+<structDecHeader>       ::= 'struct' id
+<varDeclarationK>       ::= <varDeclaration> <varDeclarationK> |
+
+<methodType>			::= 'int' | 'char' | 'boolean' | 'void' | 'struct' id | <structDeclaration>
+
+<methodDeclaration>     ::= <methodDecHeader> <block>
+
+<methodDecHeader>		::= <methodType> id '(' <parameter1> ')'
+
+<parameter1>            ::= <parameter2> |                             !Kleene afuera (parameter (p2)*)*
+<parameter2>            ::= <parameter> | <parameter2> ',' <parameter> !Kleene adentro (',' parameter)*
+
+<parameter>             ::= <parameterType> id | <parameterType> id '[' ']'
+
+<parameterType>         ::= 'int' | 'char' | 'boolean'
+
+<block>                 ::= '{' <varDeclarationK> <statementK> '}'
+<statementK>            ::= <statement> <statementK> |
+
+<statement>             ::= <block>
+                        | 'if' '(' <expression> ')' <block> <blockL>
+                        | 'while' '(' <expression> ')' <block>
+                        | 'return' <expressionL> ';'
+                        |  <location> '=' <expression> 
+                        | <expressionL> ';'
+<blockL>                ::= 'else' <block> |
+<expressionL>           ::= <expression> |
+
+
+
+!Muchos cambios se basan en: http://www.devincook.com/goldparser/doc/grammars/index.htm y
+! http://www.devincook.com/goldparser/doc/engine-pseudo/trim-reductions.htm
+! La relación de precedencia es de abajo para arriba, entre más abajo, mas "importancia"
+! tiene.
+
+! Para entender también se puede ver de izquierda a derecha. El de lado hasta la izquierda tiene mas
+! procedencia si hablamos solo de una regla.
+
+<expression>            ::= <relExp> <cond_op> <expression> | <relExp>
+
+<relExp>               ::= <sumaExp> <rel_op> <relExp> | <sumaExp> 
+
+<sumaExp>               ::= <multiExp> <suma_op> <sumaExp> | <multiExp> 
+
+<multiExp>              ::= <negadorExp> <mul_op> <multiExp> | <negadorExp>
+
+<negadorExp>            ::= '-' <val> | '!' <val> | <val>
+
+<cond_op>               ::= '&&' | '||'
+
+<rel_op>                ::= '<=' | '<' | '>' | '>=' | <eq_op>
+
+<eq_op>                 ::= '==' | '!='
+
+<suma_op>               ::= '+' | '-'
+
+<mul_op>                ::= '*' | '/' | '%'
+
+<val>                   ::= <location> | <methodCall> | <literal> | '(' <expression> ')' ! Las opciones '-' '!' son tomadas en cuenta en negadorExp
+                                                                                       ! La relacion <op> es sustituida por la regla de precedencia
+
+<location>              ::= <location1> | <location1>'.'<location>
+<location1>             ::= id  <location2>
+<location2>             ::= '[' <expression> ']'|
+
+
+<methodCall>            ::= id '(' <arg1> ')'
+<arg1>                  ::= <arg2> |
+<arg2>                  ::= <arg> | <arg2> ',' <arg>
+
+<arg>                   ::= <expression>
+
+<literal>               ::= <int_literal> | <char_literal> | <bool_literal>
+
+<int_literal>           ::= num
+
+<char_literal>          ::= character
+
+<bool_literal>          ::= 'true' | 'false'

@@ -2,6 +2,8 @@ package goldengine.java;
 
 import java.util.*;
 
+import dekf.DekfParser;
+
 /*
  * Licensed Material - Property of Matthew Hawkins (hawkini@barclays.net)
  *
@@ -40,6 +42,20 @@ public class Reduction
     private int pTokenCount;
     private Rule pParentRule;
     private int pTag;
+    
+    // Atributos semánticos
+    
+    private String type = "";
+    private String value = "";
+    
+    // Para la generación de código
+    
+    public String code = "";
+    public String true_l = "";
+    public String false_l = "";
+    public String done_l = "";
+    public int stackLength = -1;
+    public String init_code = ""; 
 
     /***************************************************************
  	 *
@@ -62,8 +78,8 @@ public class Reduction
             pTokenCount = value;
             pTokens.setSize(value);
             for(int i=0; i<value; i++)
-            {
                 pTokens.addElement(new Object());
+            {
             }
         }
     }
@@ -152,4 +168,56 @@ public class Reduction
             pTokens.setElementAt(value, index);
         }
     }
+    
+    /**
+     * Crea un arreglo con la data de las diferentes partes de la reducción.
+     * @return Un arreglo con objetos. Si la parte i es un no-terminal, se trata de una Reduction.  
+     */
+    public ArrayList getParts(){
+    	ArrayList result = new ArrayList<Reduction>();
+    	
+    	Object last = null;
+    	
+    	for( int i = 0; i < getTokenCount(); i++ ){
+    		Token t = getToken(i);
+    		if( t.getKind()==0 ){
+    			Reduction r = (Reduction) t.getData();
+    			if( r.equals(last) ) continue;
+    			else{
+    				result.add( r );
+    				last = r;
+    			}
+    		} else{
+    			String s = (String) t.getData();
+    			if( s.equals(last) ) continue;
+    			else{
+    				result.add( s );
+    				last = s;
+    			}
+    		}
+    	}
+    	
+    	return result;
+    }
+     
+    public String toString(){
+    	return pParentRule.getText();
+    }
+    
+    public void setType( String type ){
+    	this.type = type;
+    }
+    
+    public String getType(){
+    	return type;
+    }
+    
+    public String getValue(){
+    	return value;
+    }
+    
+    public void setValue(String value){
+    	this.value = value;
+    }
+    
 }
